@@ -1,0 +1,11 @@
+GET http://localhost:3000/animals
+
+###
+
+POST http://localhost:3000/animals
+Content-Type: application/json
+
+{
+    "name": "Zebra",
+    "price": 3000
+}
