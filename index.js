@@ -1,50 +1,69 @@
 const express = require('express');
-const app = express();
+const db = require('./db');
 
-// Middleware pro parsování JSON požadavků
+const app = express();
 app.use(express.json());
 
-// Nastavení správné hlavičky Content-Type s UTF-8 pro všechny odpovědi
-app.use((req, res, next) => {
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  next();
-});
-
-// Simulovaná databáze zvířat
-let animals = [
-  { id: 1, name: 'Pes', price: 5000 },
-  { id: 2, name: 'Kočka', price: 3000 }
-];
-
-// GET všech zvířat
+// GET všechna zvířata (včetně názvu kategorie)
 app.get('/animals', (req, res) => {
+  const stmt = db.prepare(`
+    SELECT animals.id, animals.name, animals.price, animals.categoryId, categories.name as categoryName
+    FROM animals
+    LEFT JOIN categories ON animals.categoryId = categories.id
+  `);
+  const animals = stmt.all();
   res.json(animals);
 });
 
-// GET jednoho zvířete podle ID
-app.get('/animals/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const animal = animals.find(a => a.id === id);
-  if (animal) {
-    res.json(animal);
-  } else {
-    res.status(404).json({ message: 'Zvíře nenalezeno' });
-  }
+// GET zvířata v konkrétní kategorii
+app.get('/categories/:id/animals', (req, res) => {
+  const stmt = db.prepare(`
+    SELECT animals.id, animals.name, animals.price, animals.categoryId, categories.name as categoryName
+    FROM animals
+    LEFT JOIN categories ON animals.categoryId = categories.id
+    WHERE animals.categoryId = ?
+  `);
+  const animals = stmt.all(req.params.id);
+  res.json(animals);
 });
 
-// POST – přidání nového zvířete
+// POST nové zvíře
 app.post('/animals', (req, res) => {
-  const { name, price } = req.body;
-  const newAnimal = {
-    id: animals.length + 1,
-    name,
-    price
-  };
-  animals.push(newAnimal);
-  res.status(201).json(newAnimal);
+  const { name, price, categoryId } = req.body;
+
+  const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(categoryId);
+  if (!category) {
+    return res.status(400).json({ message: 'Neexistující kategorie' });
+  }
+
+  const insert = db.prepare('INSERT INTO animals (name, price, categoryId) VALUES (?, ?, ?)');
+  const info = insert.run(name, price, categoryId);
+
+  const animal = db.prepare(`
+    SELECT animals.id, animals.name, animals.price, categories.name as categoryName
+    FROM animals
+    JOIN categories ON animals.categoryId = categories.id
+    WHERE animals.id = ?
+  `).get(info.lastInsertRowid);
+
+  res.status(201).json(animal);
 });
 
-// Spuštění serveru na portu 3000
+// GET všechny kategorie
+app.get('/categories', (req, res) => {
+  const stmt = db.prepare('SELECT * FROM categories');
+  res.json(stmt.all());
+});
+
+// POST nová kategorie
+app.post('/categories', (req, res) => {
+  const { name } = req.body;
+  const insert = db.prepare('INSERT INTO categories (name) VALUES (?)');
+  const info = insert.run(name);
+  const newCategory = db.prepare('SELECT * FROM categories WHERE id = ?').get(info.lastInsertRowid);
+  res.status(201).json(newCategory);
+});
+
 app.listen(3000, () => {
   console.log('API běží na http://localhost:3000');
 });
