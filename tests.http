@@ -7,5 +7,20 @@ Content-Type: application/json
 
 {
     "name": "Zebra",
-    "price": 3000
+    "price": 3000,
+    "categoryId": "2"
 }
+
+###
+
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "savec"
+}
+
+###
+
+GET http://localhost:3000/categories
+Content-Type: application/json
