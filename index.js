@@ -15,18 +15,6 @@ app.get('/animals', (req, res) => {
   res.json(animals);
 });
 
-// GET zvířata v konkrétní kategorii
-app.get('/categories/:id/animals', (req, res) => {
-  const stmt = db.prepare(`
-    SELECT animals.id, animals.name, animals.price, animals.categoryId, categories.name as categoryName
-    FROM animals
-    LEFT JOIN categories ON animals.categoryId = categories.id
-    WHERE animals.categoryId = ?
-  `);
-  const animals = stmt.all(req.params.id);
-  res.json(animals);
-});
-
 // POST nové zvíře
 app.post('/animals', (req, res) => {
   const { name, price, categoryId } = req.body;

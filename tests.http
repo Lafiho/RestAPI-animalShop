@@ -6,8 +6,8 @@ POST http://localhost:3000/animals
 Content-Type: application/json
 
 {
-    "name": "Zebra",
-    "price": 3000,
+    "name": "pes",
+    "price": 10000,
     "categoryId": "2"
 }
 
@@ -17,10 +17,12 @@ POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-  "name": "savec"
+  "name": "vacnatec"
 }
 
 ###
 
 GET http://localhost:3000/categories
 Content-Type: application/json
+
+###
