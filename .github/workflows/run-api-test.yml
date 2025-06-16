@@ -1,0 +1,19 @@
+name: Lokální API test přes self-hosted runner
+
+on:
+  workflow_dispatch:  # umožňuje spustit ručně z GitHubu
+
+jobs:
+  test-local-api:
+    runs-on: self-hosted  # běží na tvém počítači, ne v cloudu
+
+    steps:
+      - name: Zobraz základní info o systému
+        run: |
+          echo "Uživatel: $env:USERNAME"
+          echo "Stroj: $env:COMPUTERNAME"
+
+      - name: Zavolání REST API
+        run: |
+          echo "Volání http://localhost:3000/api/animals"
+          curl http://localhost:3000/api/animals
