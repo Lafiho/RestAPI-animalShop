@@ -1,11 +1,11 @@
 name: Lokální API test přes self-hosted runner
 
 on:
-  workflow_dispatch:  # umožňuje spustit ručně z GitHubu
+  workflow_dispatch:  # Umožňuje ruční spuštění z GitHubu
 
 jobs:
   test-local-api:
-    runs-on: self-hosted  # běží na tvém počítači, ne v cloudu
+    runs-on: self-hosted  # Běží na tvém Windows 11 stroji
 
     steps:
       - name: Zobraz základní info o systému
@@ -13,7 +13,18 @@ jobs:
           echo "Uživatel: $env:USERNAME"
           echo "Stroj: $env:COMPUTERNAME"
 
-      - name: Zavolání REST API
+      - name: Ověření status kódu 200 při volání /animals
         run: |
-          echo "Volání http://localhost:3000/animals"
-          curl --% -X GET http://localhost:3000/animals
+          Write-Host "Volání http://localhost:3000/animals a kontrola status kódu"
+          $status = & curl.exe -s -o $null -w "%{http_code}" http://localhost:3000/animals
+          if ($status -ne 200) {
+            Write-Host "Neočekávaný status kód: $status"
+            exit 1
+          } else {
+            Write-Host "Status kód OK: $status"
+          }
+
+      - name: Výpis JSON odpovědi z GET /animals
+        run: |
+          Write-Host "Získaná odpověď z API:"
+          & curl.exe -X GET http://localhost:3000/animals -H "Accept: application/json"
