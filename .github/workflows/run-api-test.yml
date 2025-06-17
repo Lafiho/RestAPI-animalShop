@@ -16,4 +16,4 @@ jobs:
       - name: Zavolání REST API
         run: |
           echo "Volání http://localhost:3000/animals"
-          curl -X GET http://localhost:3000/animals
+          curl http://localhost:3000/animals
