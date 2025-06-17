@@ -3,7 +3,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/animals/1
+GET http://localhost:3000/animals/2
 Content-Type: application/json
 
 ###

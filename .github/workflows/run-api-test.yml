@@ -13,7 +13,7 @@ jobs:
           echo "Uživatel: $env:USERNAME"
           echo "Stroj: $env:COMPUTERNAME"
 
-      - name: Volání endpointu GET /animals
+      - name: Zavolání REST API
         run: |
-          echo "Volání GET http://localhost:3000/animals"
-          curl -X GET http://localhost:3000/animals
+          echo "Volání http://localhost:3000/animals"
+          curl http://localhost:3000/animals
